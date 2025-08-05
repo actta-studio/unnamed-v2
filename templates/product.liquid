@@ -1,0 +1,19 @@
+{% comment %} placeholder for product.liquid since it is required {% endcomment %}
+{% comment %} actual products will be rendered through the custom tag 'product-modal' and the section rendering api {% endcomment %}
+
+{% comment %} BEM for css naming structures {% endcomment %}
+
+<section class="product">
+	<figure class="product__image"></figure>
+	<article class="product__details">
+		<h1 class="product-title">Sample Product Title</h1>
+		<p class="product-price">$50.00</p>
+		<form method="post" action="/cart/add">
+			<input type="hidden" name="id" value="1234567890" />
+			<button type="submit" class="product__add-to-cart">
+				Add to Cart
+			</button>
+		</form>
+		<p>Placeholder for product description</p>
+	</article>
+</section>

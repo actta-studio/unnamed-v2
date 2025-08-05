@@ -1,0 +1,9 @@
+{% comment %} This is just an example to show how we will handle dynamic imports for components
+  or snippets that appear on some pages - that way we only load neccessary js {% endcomment %}
+
+{% comment %} this component will be resposible for mounting its own js and css {% endcomment %}
+
+ <header class="header" data-label="header">
+</header>
+
+<script type="module" src="{{ 'snippet__header.js' | asset_url }}"></script>

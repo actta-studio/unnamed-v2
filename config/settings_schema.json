@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Unnamed Theme Info",
+    "settings": [
+      {
+        "type": "text",
+        "id": "theme_version",
+        "label": "Theme Version",
+        "default": "1.0.0"
+      }
+    ]
+  },
+  {
+    "name": "Unnamed Theme Settings",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Theme Settings"
+      }
+    ]
+  }
+]
