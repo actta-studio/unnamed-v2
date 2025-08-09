@@ -1,3 +1,60 @@
+/* TODO: define z-indexes helper function */
+/* TODO: integrate SCSS */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 .page {
   visibility: hidden;
+}
+
+.preloader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+
+  background-color: #fefefe;
+  z-index: 5000;
+}
+
+.preloader__inner {
+  width: 100%;
+  height: 100%;
+}
+
+.preloader__inner .preloader__progress {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.preloader__inner .image-container {
+  width: min(100vw - 4rem, 12rem);
+  aspect-ratio: 4/5;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #d9d9d9;
+}
+
+.preloader__inner .image-container .preloader__image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }

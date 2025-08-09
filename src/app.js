@@ -4,11 +4,15 @@ import Lenis from "lenis";
 import Home from "./templates/home";
 import About from "./templates/about";
 
+// [component imports]
+import Preloader from "./components/Preloader";
+
 class App {
   constructor() {
     console.log("App initialized");
 
     this.initLenis();
+    this.createPreloader();
     this.createContent();
 
     this.createTemplates();
@@ -19,33 +23,6 @@ class App {
     this.template = this.content.getAttribute("data-template");
 
     console.log("Content created", this.content, this.template);
-  }
-
-  initLenis() {
-    window.scrollTo(0, 0);
-    this.lenis = new Lenis({
-      easing: (x) => {
-        return -(Math.cos(Math.PI * x) - 1) / 2;
-      },
-    });
-
-    this.raf = this.raf.bind(this);
-    requestAnimationFrame(this.raf);
-
-    this.lenis.stop();
-  }
-
-  raf(time) {
-    this.lenis.raf(time);
-    requestAnimationFrame(this.raf);
-  }
-
-  suspendScroll() {
-    this.lenis.stop();
-  }
-
-  resumeScroll() {
-    this.lenis.start();
   }
 
   createTemplates() {
@@ -76,6 +53,33 @@ class App {
   createPreloader() {
     this.preloader = new Preloader();
     this.preloader.once("completed", this.onPreloaded.bind(this));
+  }
+
+  initLenis() {
+    window.scrollTo(0, 0);
+    this.lenis = new Lenis({
+      easing: (x) => {
+        return -(Math.cos(Math.PI * x) - 1) / 2;
+      },
+    });
+
+    this.raf = this.raf.bind(this);
+    requestAnimationFrame(this.raf);
+
+    this.lenis.stop();
+  }
+
+  raf(time) {
+    this.lenis.raf(time);
+    requestAnimationFrame(this.raf);
+  }
+
+  suspendScroll() {
+    this.lenis.stop();
+  }
+
+  resumeScroll() {
+    this.lenis.start();
   }
 
   async onChange({ url, push = true }) {
