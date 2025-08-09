@@ -7,7 +7,9 @@
     "dev": "shopify theme dev",
     "watch": "nodemon -e js,ts,html,scss,css --ignore assets --exec 'npm run build'",
     "build": "vite build",
-    "browser-sync": "browser-sync start --files 'assets/*.*' --no-open --proxy 'http://127.0.0.1:9292'"
+    "browser-sync": "browser-sync start --files 'assets/*.*' --no-open --proxy 'http://127.0.0.1:9292'",
+    "shopify: pull": "shopify theme pull -d -e development",
+    "shopify: pull--local": "shopify theme pull -d"
   },
   "keywords": [],
   "author": "",
