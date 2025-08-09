@@ -22,6 +22,8 @@
 
 		{%render "header"%}
 
+		{% section "preloader" %}
+
 		<main id="content" data-template="{{ normalized_template_name | strip }}">
 			{{content_for_layout}}
 		</main>
