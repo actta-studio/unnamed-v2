@@ -68,6 +68,7 @@ export default class Page {
       this.animateOut = GSAP.timeline();
       this.animateOut.to(this.element, {
         autoAlpha: 0,
+        delay: 0.5,
       });
       this.animateOut.call((_) => {
         this.destroy();

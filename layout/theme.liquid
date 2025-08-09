@@ -20,11 +20,11 @@
 	<body>
 		<product-modal></product-modal>
 
+		{%render "header"%}
+
 		<main id="content" data-template="{{ normalized_template_name | strip }}">
 			{{content_for_layout}}
 		</main>
-
-
 
 		<script type="module" defer src="{{ 'global__app.js' | asset_url }}"></script>
 

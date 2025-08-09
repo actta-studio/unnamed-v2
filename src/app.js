@@ -1,7 +1,8 @@
 import Lenis from "lenis";
 
 // [page imports]
-import Home from "./templates/Home";
+import Home from "./templates/home";
+import About from "./templates/about";
 
 class App {
   constructor() {
@@ -53,6 +54,13 @@ class App {
     this.templates.set(
       "home",
       new Home({
+        lenis: this.lenis,
+      })
+    );
+
+    this.templates.set(
+      "page.about",
+      new About({
         lenis: this.lenis,
       })
     );
