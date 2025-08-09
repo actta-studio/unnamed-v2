@@ -1,0 +1,63 @@
+{% schema %}
+
+  {
+    "name": "Preloader",
+    "tag": "section",
+    "class": "preloader",
+    "limit": 1,
+    "max_blocks": 5,
+    "blocks": [
+      {
+        "type": "preloader-image",
+        "name": "Preloader Image",
+        "limit": 5,
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          }, {
+            "type": "text",
+            "id": "alt",
+            "label": "Alt text (recommended)"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Preloader",
+        "blocks": [
+          {
+            "type": "preloader-image"
+          }, {
+            "type": "preloader-image"
+          }, {
+            "type": "preloader-image"
+          }
+        ]
+      }
+    ],
+    "enabled_on": {
+      "templates": ["*"]
+    }
+
+  }
+
+{% endschema %}
+
+{% comment %} SECTION START {% endcomment %}
+
+<div class="preloader__inner">
+  <div class="preloader__progress">0%</div>
+  <figure class="image-container">
+    {% for block in section.blocks %}
+      {% if block.type == "preloader__image" and block.settings.image != blank %}
+        <img
+          class="preloader-image"
+          data-src="{{ block.settings.image | image_url }}"
+          alt="{{ block.settings.alt | escape }}">
+      {% endif %}
+    {% endfor %}
+  </figure>
+</div>
