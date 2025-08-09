@@ -1,15 +1,30 @@
+{% capture normalized_template_name %}
+  {% if template.name == 'index' %}
+    home
+  {% elsif template.name == 'shop' %}
+    index
+  {% else %}
+    {{ template.name }}{% if template.suffix %}.{{ template.suffix }}{% endif %}
+  {% endif %}
+{% endcapture %}
+
 <!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+		<link rel="stylesheet" href="{{ 'main.css' | asset_url }}">
 		{{	content_for_header	}}
 	</head>
 
 	<body>
 		<product-modal></product-modal>
-		{{content_for_layout}}
+
+		<main id="content" data-template="{{ normalized_template_name | strip }}">
+			{{content_for_layout}}
+		</main>
+
+
 
 		<script type="module" defer src="{{ 'global__app.js' | asset_url }}"></script>
 
