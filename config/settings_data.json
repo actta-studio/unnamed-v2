@@ -1,0 +1,55 @@
+{
+  "current": {
+    "sections": {
+      "preloader": {
+        "type": "preloader",
+        "blocks": {
+          "preloader_image_p7qgDq": {
+            "type": "preloader-image",
+            "settings": {
+              "image": "shopify:\/\/shop_images\/1.png",
+              "alt": ""
+            }
+          },
+          "preloader_image_7pqfPc": {
+            "type": "preloader-image",
+            "settings": {
+              "image": "shopify:\/\/shop_images\/2.png",
+              "alt": ""
+            }
+          },
+          "preloader_image_HFwW7V": {
+            "type": "preloader-image",
+            "settings": {
+              "image": "shopify:\/\/shop_images\/3.png",
+              "alt": ""
+            }
+          },
+          "preloader_image_t7twRx": {
+            "type": "preloader-image",
+            "settings": {
+              "image": "shopify:\/\/shop_images\/4.png",
+              "alt": ""
+            }
+          },
+          "preloader_image_r6BLkr": {
+            "type": "preloader-image",
+            "settings": {
+              "image": "shopify:\/\/shop_images\/5.png",
+              "alt": ""
+            }
+          }
+        },
+        "block_order": [
+          "preloader_image_p7qgDq",
+          "preloader_image_7pqfPc",
+          "preloader_image_HFwW7V",
+          "preloader_image_t7twRx",
+          "preloader_image_r6BLkr"
+        ],
+        "settings": {}
+      }
+    },
+    "content_for_index": []
+  }
+}
