@@ -55,8 +55,8 @@ img {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 31vmin;
-  height: calc(31vmin * 4 / 3);
+  width: 25vmin;
+  height: calc(25vmin * 5 / 4);
   transform-style: preserve-3d;
   will-change: transform;
   visibility: hidden;

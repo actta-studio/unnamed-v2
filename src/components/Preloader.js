@@ -220,13 +220,11 @@ export default class Preloader extends Component {
   }
 
   createBackOvershootEaseForPeak(minScale, maxScale, targetPeakScale) {
-    // Convert target absolute peak to normalized peak in [0..1] space
     const normTargetPeak = (targetPeakScale - minScale) / (maxScale - minScale);
 
-    // Binary-search overshoot 's' so backOut's peak ~= normTargetPeak
     let lo = 0.0,
       hi = 12.0,
-      best = 1.70158; // GSAP-ish default start
+      best = 1.70158;
     for (let iter = 0; iter < 20; iter++) {
       const mid = (lo + hi) / 2;
       const peak = this.backOutPeakValue(mid);
@@ -237,7 +235,6 @@ export default class Preloader extends Component {
       }
       best = mid;
     }
-    // Return the tuned normalized ease (0..1 -> 0..1 with overshoot)
     return (t) => this.backOut(t, best);
   }
 
