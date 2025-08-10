@@ -50,14 +50,17 @@
 
 <div class="preloader__inner">
   <div class="preloader__progress">0%</div>
-  <figure class="image-container">
-    {% for block in section.blocks %}
-      {% if block.type == "preloader__image" and block.settings.image != blank %}
-        <img
-          class="preloader-image"
-          data-src="{{ block.settings.image | image_url }}"
-          alt="{{ block.settings.alt | escape }}">
-      {% endif %}
-    {% endfor %}
-  </figure>
+  <div class="preloader__stage">
+    <div class="image-container">
+
+      {% for block in section.blocks %}
+        {% if block.type == 'preloader-image' and block.settings.image != blank %}
+          <img
+            class="preloader__image"
+            data-src="{{ block.settings.image | image_url: width: 1200, height: 1200, crop: 'center' }}"
+            alt="{{ block.settings.alt | escape }}">
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
 </div>
