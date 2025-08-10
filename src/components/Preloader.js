@@ -203,6 +203,44 @@ export default class Preloader extends Component {
     });
   }
 
+  backOut(t, s) {
+    const c3 = s + 1;
+    const x = t - 1;
+    return 1 + c3 * x * x * x + s * x * x;
+  }
+
+  backOutPeakValue(s, samples = 200) {
+    let peak = 0;
+    for (let i = 0; i <= samples; i++) {
+      const t = i / samples;
+      const v = this.backOut(t, s);
+      if (v > peak) peak = v;
+    }
+    return peak;
+  }
+
+  createBackOvershootEaseForPeak(minScale, maxScale, targetPeakScale) {
+    // Convert target absolute peak to normalized peak in [0..1] space
+    const normTargetPeak = (targetPeakScale - minScale) / (maxScale - minScale);
+
+    // Binary-search overshoot 's' so backOut's peak ~= normTargetPeak
+    let lo = 0.0,
+      hi = 12.0,
+      best = 1.70158; // GSAP-ish default start
+    for (let iter = 0; iter < 20; iter++) {
+      const mid = (lo + hi) / 2;
+      const peak = this.backOutPeakValue(mid);
+      if (peak < normTargetPeak) {
+        lo = mid;
+      } else {
+        hi = mid;
+      }
+      best = mid;
+    }
+    // Return the tuned normalized ease (0..1 -> 0..1 with overshoot)
+    return (t) => this.backOut(t, best);
+  }
+
   async onLoaded() {
     if (this._done) return;
     this._done = true;
@@ -237,21 +275,22 @@ export default class Preloader extends Component {
       startDeg: 300,
       endDeg: 360,
 
-      radius: 100,
+      radius: 500,
       extraUnits,
       liftUnits: 0,
 
-      depthStrength: 300,
+      depthStrength: 400,
       minScale: 0.82,
       maxScale: 1.08,
-      minRot: 95,
+      minRot: 85,
       maxRot: 0,
-      duration: 1500,
-
       duration: 1200,
-      easeY: (t) => t,
-      easeScale: (t) => t,
-      easeRot: (t) => t,
+
+      duration: 1700,
+      easeY: (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
+      easeScale: this.createBackOvershootEaseForPeak(0.62, 1.0, 1),
+      easeRot: (t) =>
+        t < 0.5 ? 16 * t * t * t * t * t : 1 - Math.pow(-2 * t + 2, 5) / 2,
     });
   }
 

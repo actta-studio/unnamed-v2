@@ -53,7 +53,7 @@
   <div class="preloader__stage">
     <div class="image-container">
 
-      {% for block in section.blocks %}
+      {% for block in section.blocks limit: 1 %}
         {% if block.type == 'preloader-image' and block.settings.image != blank %}
           <img
             class="preloader__image"
