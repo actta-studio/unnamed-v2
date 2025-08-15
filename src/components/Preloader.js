@@ -8,9 +8,9 @@ export default class Preloader extends Component {
       element: ".preloader",
       elements: {
         stage: ".preloader__stage",
-        "image-container": ".image-container",
-        progress: ".preloader__progress",
-        images: null,
+        content: ".content",
+        "progress-indicator": ".preloader__progress-indicator",
+        images: document.querySelectorAll("img"),
       },
     });
 
@@ -23,46 +23,68 @@ export default class Preloader extends Component {
         return 1 - inv * inv * ((s + 1) * inv - s);
       };
 
-    // this.elements.set(
-    //   "images",
-    //   this.element.querySelectorAll(".preloader__image")
-    // );
-
     this.length = 0;
     this.createLoader();
+
+    this._loading_done = false;
   }
 
-  createLoader() {
-    // if (this.elements.get("images").length === 0) {
-    //   this.elements.get("progress").innerHTML = "100%";
-    //   this.onLoaded();
-    //   return;
-    // } else {
-    //   each(
-    //     this.elements.get("images"),
-    //     (element) => {
-    //       setTimeout(() => {
-    //         element.onload = (_) => this.onAssetLoaded(element);
-    //         element.src = element.getAttribute("data-src");
-    //         element.classList.add("loaded");
-    //       });
-    //     },
-    //     2000
-    //   );
-    // }
-
-    this.onLoaded();
+  async createLoader() {
+    if (this.elements.get("images").length === 0) {
+      await this.setProgressIndicator(1);
+      if (!this._done) this.onLoaded();
+      return;
+    } else {
+      each(
+        this.elements.get("images"),
+        (element) => {
+          setTimeout(() => {
+            element.onload = (_) => this.onAssetLoaded(element);
+            element.src = element.getAttribute("data-src");
+            element.classList.add("loaded");
+          });
+        },
+        2000
+      );
+    }
   }
 
-  onAssetLoaded(image) {
+  setProgressIndicator(percent) {
+    const progressIndicator = this.elements.get("progress-indicator");
+    if (!progressIndicator) return Promise.resolve();
+
+    const currentValue =
+      parseFloat(
+        getComputedStyle(progressIndicator).getPropertyValue("--progress")
+      ) || 0;
+
+    const targetValue = Math.max(0, Math.min(percent * 100, 100));
+    const delta = Math.abs(targetValue - currentValue);
+
+    const duration = Math.max(0.3, Math.min(1.2, delta / 80));
+
+    if (this._progressTween) this._progressTween.kill();
+
+    return new Promise((resolve) => {
+      this._progressTween = GSAP.to(progressIndicator, {
+        "--progress": targetValue,
+        duration,
+        ease: "power2.out",
+        onComplete: resolve,
+      });
+    });
+  }
+
+  async onAssetLoaded() {
     this.length += 1;
     const percent = this.length / (this.elements.get("images").length ?? 1);
 
     const clampedPercent = Math.max(0, Math.min(percent * 100, 100));
 
-    this.elements.get("progress").innerHTML = Math.round(clampedPercent) + "%";
+    this.setProgressIndicator(percent);
 
-    if (percent === 1) {
+    if (clampedPercent == 100 && !this._loading_done) {
+      await this.setProgressIndicator(1);
       this.onLoaded();
     }
   }
@@ -87,23 +109,19 @@ export default class Preloader extends Component {
       easeY = (t) => t,
       easeScale = (t) => t,
       easeRot = (t) => t,
+
+      tailDrop = 0.06,
+      tailWindow = 0.18,
+      tailCurve = 2.0,
     } = opts;
 
     if (!el) return Promise.resolve();
 
-    const images = Array.from(el.querySelectorAll("img"));
-    const imgCount = images.length;
-    images.forEach((img, i) => {
-      img.style.position = "absolute";
-      img.style.inset = "0";
-      img.style.opacity = i === 0 ? "1" : "0";
-      img.style.visibility = "visible";
-      img.style.pointerEvents = "none";
-    });
-
     const toRad = (d) => (d * Math.PI) / 180;
     const lerp = (a, b, t) => a + (b - a) * t;
     const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    const smoothstep = (t) => t * t * (3 - 2 * t);
+    const powmix = (t, k) => (k <= 1 ? t : Math.pow(t, k));
 
     const t0 = toRad(startDeg);
     const t1 = toRad(endDeg);
@@ -140,13 +158,11 @@ export default class Preloader extends Component {
       el.style.transform =
         `${baseTranslate} translate3d(0, ${y0px}px, ${z0px}px) ` +
         `scale(${s0 * 0.98}, ${s0}) rotateX(${r0}deg)`;
-
       el.style.visibility = "visible";
     }
 
     return new Promise((resolve) => {
       const tStart = performance.now();
-      let lastIndex = 0;
 
       const step = (now) => {
         const elapsed = now - tStart;
@@ -154,23 +170,23 @@ export default class Preloader extends Component {
         const pY = typeof easeY === "function" ? easeY(pTime) : pTime;
 
         const theta = lerp(t0, t1, pY);
+        const u = yUnits(theta);
+        const ypx = u * unitToPx;
+        const d = clamp(depth01(theta), 0, 1);
 
-        const pMotion = clamp((theta - t0) / (t1 - t0), 0, 1);
-        if (imgCount > 1) {
-          const seg = Math.floor(pMotion * imgCount);
-          if (seg !== lastIndex) {
-            images.forEach((img, i) => {
-              img.style.opacity = i === seg ? "1" : "0";
-            });
-            lastIndex = seg;
+        const baseS = lerp(minScale, maxScale, easeScale(d));
+
+        let taper = 1;
+        if (tailDrop > 0 && tailWindow > 0) {
+          const startTail = 1 - tailWindow;
+          if (pTime >= startTail) {
+            const uTail = clamp((pTime - startTail) / tailWindow, 0, 1);
+            const shaped = powmix(smoothstep(uTail), tailCurve);
+            taper = 1 - tailDrop * shaped;
           }
         }
 
-        const u = yUnits(theta);
-        const ypx = u * unitToPx;
-
-        const d = clamp(depth01(theta), 0, 1);
-        const s = lerp(minScale, maxScale, easeScale(d));
+        const s = baseS * taper;
         const rX = lerp(minRot, maxRot, easeRot(d));
         const zpx = -depthStrength * (1 - d);
 
@@ -181,16 +197,6 @@ export default class Preloader extends Component {
         if (pTime < 1) {
           requestAnimationFrame(step);
         } else {
-          const sEnd = lerp(minScale, maxScale, 1);
-          el.style.transform =
-            `${baseTranslate} translate3d(0, ${endU * unitToPx}px, 0px) ` +
-            `scale(${sEnd * 0.98}, ${sEnd}) rotateX(0deg)`;
-
-          if (imgCount > 0) {
-            images.forEach(
-              (img, i) => (img.style.opacity = i === imgCount - 1 ? "1" : "0")
-            );
-          }
           resolve();
         }
       };
@@ -221,73 +227,47 @@ export default class Preloader extends Component {
 
   createBackOvershootEaseForPeak(minScale, maxScale, targetPeakScale) {
     const normTargetPeak = (targetPeakScale - minScale) / (maxScale - minScale);
-
     let lo = 0.0,
       hi = 12.0,
       best = 1.70158;
     for (let iter = 0; iter < 20; iter++) {
       const mid = (lo + hi) / 2;
       const peak = this.backOutPeakValue(mid);
-      if (peak < normTargetPeak) {
-        lo = mid;
-      } else {
-        hi = mid;
-      }
+      if (peak < normTargetPeak) lo = mid;
+      else hi = mid;
       best = mid;
     }
     return (t) => this.backOut(t, best);
   }
 
   async onLoaded() {
-    if (this._done) return;
-    this._done = true;
-
-    const el = this.element.querySelector(".image-container");
+    const el = this.elements.get("content");
     if (!el) return;
-
     el.style.transform = "translate(-50%, -50%)";
     el.style.visibility = "hidden";
-
     const unitToPx = window.innerHeight / 2 / 200;
     const extraPx = el.offsetHeight / 2 + 90;
     const extraUnits = extraPx / unitToPx;
-
     await this.animateArcBottomToCenterUnitsRAF(el, {
       bottomUnits: 200,
-
       startDeg: 300,
       endDeg: 360,
-
-      radius: 1000,
-      extraUnits,
-      liftUnits: 0,
-
-      depthStrength: 2000,
-      minScale: 0.62,
-      maxScale: 1,
-      minRot: -90,
-      maxRot: 0,
-
-      bottomUnits: 200,
-      startDeg: 300,
-      endDeg: 360,
-
       radius: 500,
       extraUnits,
       liftUnits: 0,
-
       depthStrength: 400,
       minScale: 0.82,
       maxScale: 1.08,
       minRot: 85,
       maxRot: 0,
-      duration: 1200,
-
       duration: 1700,
       easeY: (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
-      easeScale: this.createBackOvershootEaseForPeak(0.62, 1.0, 1),
+      easeScale: this.createBackOvershootEaseForPeak(0.82, 1.08, 1.08),
       easeRot: (t) =>
         t < 0.5 ? 16 * t * t * t * t * t : 1 - Math.pow(-2 * t + 2, 5) / 2,
+      tailDrop: 0.03,
+      tailWindow: 0.18,
+      tailCurve: 2.0,
     });
   }
 
