@@ -49,18 +49,22 @@
 {% comment %} SECTION START {% endcomment %}
 
 <div class="preloader__inner">
-  <div class="preloader__progress">0%</div>
+  <div class="preloader__progress-indicator"></div>
   <div class="preloader__stage">
-    <div class="image-container">
+    <div class="content">
+      <span>ST</span>
+      <div class="images">
+        {% for block in section.blocks %}
+          {% if block.type == 'preloader-image' and block.settings.image != blank %}
+            <img
+              class="preloader__image"
+              data-src="{{ block.settings.image | image_url: width: 1200, height: 1200, crop: 'center' }}"
+              alt="{{ block.settings.alt | escape }}">
+          {% endif %}
+        {% endfor %}
 
-      {% for block in section.blocks limit: 1 %}
-        {% if block.type == 'preloader-image' and block.settings.image != blank %}
-          <img
-            class="preloader__image"
-            data-src="{{ block.settings.image | image_url: width: 1200, height: 1200, crop: 'center' }}"
-            alt="{{ block.settings.alt | escape }}">
-        {% endif %}
-      {% endfor %}
+      </div>
+      <span>18</span>
     </div>
   </div>
 </div>
