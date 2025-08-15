@@ -1,6 +1,10 @@
 /* TODO: define z-indexes helper function */
 /* TODO: integrate SCSS */
 
+:root {
+  --r: calc((100vw / 1920) * 10);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -35,12 +39,17 @@ img {
   contain: layout paint;
 }
 
-.preloader__inner .preloader__progress {
-  position: absolute;
-  top: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
+.preloader__inner .preloader__progress-indicator {
+  --progress: 10;
+  position: fixed;
+  top: 0;
+  left: 0%;
+  width: 100%;
+  height: 0.15rem;
   z-index: 1000;
+  transform: scaleX(calc(var(--progress) / 100));
+  transform-origin: left;
+  background-color: #bd4a36;
 }
 
 .preloader__stage {
@@ -51,28 +60,43 @@ img {
   overflow: hidden;
 }
 
-.image-container {
+.content {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 25vmin;
-  height: calc(25vmin * 5 / 4);
   transform-style: preserve-3d;
   will-change: transform;
   visibility: hidden;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: calc(3 * var(--r));
 }
 
-.image-container img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.content span {
+  font-size: calc(20 * var(--r));
+  display: block;
+  font-weight: 700;
   visibility: hidden;
 }
 
-.image-container img:nth-child(1) {
-  visibility: visible;
+.content .images {
+  position: relative;
+  width: calc(25.2 * var(--r));
+  height: calc(31.5 * var(--r));
+  overflow: hidden;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.content .images img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  vertical-align: middle;
 }
 
 .preloader * {
