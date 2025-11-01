@@ -24,6 +24,10 @@ function getEntriesFor(dirName, prefix) {
   return entries;
 }
 
+function getScssEntries() {
+  return getEntriesFor("scss", "style", ".scss");
+}
+
 export default defineConfig({
   root: "src",
   base: "",
@@ -38,6 +42,7 @@ export default defineConfig({
         ...getEntriesFor("snippets", "snippet"),
         ...getEntriesFor("components", "component"),
         ...getEntriesFor("templates", "template"),
+        ...getScssEntries(),
       },
       output: {
         entryFileNames: "[name].js",
